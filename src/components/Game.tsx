@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   BookOpen,
   ChevronDown,
@@ -34,11 +34,13 @@ export function Game({
   const bridge = useRef<SceneBridge | null>(null);
   const callbacks = useRef({ onOpen, onReady });
   callbacks.current = { onOpen, onReady };
+  const flags = useRef({ paused, reducedMotion });
+  flags.current = { paused, reducedMotion };
   useEffect(() => {
     let disposed = false;
     const b: SceneBridge = {
-      paused: true,
-      reducedMotion: false,
+      paused: flags.current.paused,
+      reducedMotion: flags.current.reducedMotion,
       direction: { x: 0, y: 0 },
       labels: labels.current,
       stage: stage.current!,
@@ -77,7 +79,7 @@ export function Game({
       engine.current = null;
     };
   }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (bridge.current) {
       bridge.current.paused = paused;
       bridge.current.reducedMotion = reducedMotion;

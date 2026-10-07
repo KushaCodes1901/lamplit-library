@@ -38,7 +38,7 @@ export function Help({ onClose }: { onClose: () => void }) {
         <div>
           <h2>Or let the room guide you</h2>
           <p>
-            Click a shelf label to walk there automatically. Browse Books opens
+            Click a shelf or its label to walk there automatically. Browse Books opens
             every story without walking.
           </p>
         </div>

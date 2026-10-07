@@ -18,6 +18,7 @@ Tested on 7 October 2026 using the Codex browser tools. This records browser vie
 ## Browser checks
 
 - All four shelves were reached in the production build by automatic obstacle-aware movement. Their panels each displayed exactly two matching stories.
+- Direct clicks on the illustrated bookcase artwork were also exercised in the production preview, independently of the genre label buttons.
 - WASD movement and E interaction were exercised. Escape closed the catalog and restored focus to the library. Search typing did not change the visitor's position.
 - At 390 × 844, a held direction control moved the visitor, every genre shortcut reached its shelf, and the large Browse button opened the nearby shelf. Pointer cancellation is additionally covered by the component test.
 - Opening a book and returning restored the exact ground position: the Mystery shelf remained at `(795, 585)`.

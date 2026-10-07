@@ -80,7 +80,17 @@ export class LibraryScene extends Phaser.Scene {
         .image(p.x, p.y, "shelf")
         .setOrigin(0.5, 0.9)
         .setDisplaySize(348, 215)
-        .setDepth(p.y);
+        .setDepth(p.y)
+        .setInteractive({
+          useHandCursor: true,
+          pixelPerfect: true,
+          alphaTolerance: 16,
+        });
+      sprite.on("pointerdown", () => {
+        if (this.bridge.paused) return;
+        this.approach(s.genre);
+        this.bridge.stage.focus();
+      });
       this.furniture.push({
         sprite,
         ground: { x: s.x + s.w / 2, y: s.y + s.h },
@@ -323,7 +333,7 @@ export function createLibrary(parent: HTMLElement, bridge: SceneBridge) {
     fps: { target: 60, forceSetTimeOut: false },
     audio: { noAudio: true },
     banner: false,
-    input: { keyboard: false, mouse: false, touch: false, gamepad: false },
+    input: { keyboard: false, gamepad: false },
   });
   return { game, scene };
 }

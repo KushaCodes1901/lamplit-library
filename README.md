@@ -9,7 +9,7 @@ A cozy, playable browser library. Walk through a rainy evening room, browse four
 ## Controls
 
 - **Keyboard:** WASD or arrows to walk; E or Enter beside a shelf to browse; Escape returns to the library.
-- **Mouse:** click a genre label to walk around furniture to that shelf.
+- **Mouse:** click an illustrated shelf or its genre label to walk around furniture to that shelf.
 - **Touch:** direction pad and Browse button; bottom genre shortcuts navigate to off-screen shelves.
 - **Reading:** previous/next or left/right arrows; chapters, bookmarks, size, three themes, and continuous scrolling.
 - **Browse Books** opens the complete searchable catalog without game navigation. **Continue Reading** restores the last book.
