@@ -4,7 +4,7 @@ A cozy, playable browser library. Walk through a rainy evening room, browse four
 
 **[Enter the library](https://KushaCodes1901.github.io/lamplit-library/)**
 
-![The illustrated library](docs/screenshots/library-desktop.jpg)
+![The illustrated library](docs/screenshots/library-live.jpg)
 
 ## Controls
 

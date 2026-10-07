@@ -30,7 +30,9 @@ Tested on 7 October 2026 using the Codex browser tools. This records browser vie
 
 ## Publishing
 
-Live deployment verification is recorded after the GitHub Pages workflow completes.
+The public repository is [KushaCodes1901/lamplit-library](https://github.com/KushaCodes1901/lamplit-library). The [GitHub Actions build and deployment](https://github.com/KushaCodes1901/lamplit-library/actions/runs/37683042382) both completed successfully, including all fourteen tests on the Linux runner.
+
+The actual [public library](https://kushacodes1901.github.io/lamplit-library/) was opened and inspected after deployment. The room and cover artwork loaded, automatic navigation reached Mystery, and The Blue Envelope opened from that shelf. Page navigation and bookmarking worked; returning retained the shelf position `(795, 585)`. After a full public-page reload, Continue Reading restored word anchor `164` and the bookmark. No browser console errors were recorded. A screenshot of the public room is saved in `docs/screenshots/library-live.jpg`.
 
 ## Practical limits
 
