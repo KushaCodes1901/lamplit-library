@@ -25,6 +25,9 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+      - name: Stamp the published release
+        run: |
+          node --input-type=module -e "import { writeFileSync } from 'node:fs'; writeFileSync('dist/release.json', JSON.stringify({ commit: process.env.GITHUB_SHA }) + '\n')"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
@@ -42,3 +45,18 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify the live release
+        env:
+          PUBLISHED_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          for attempt in {1..12}; do
+            published=$(curl --fail --silent --show-error --max-time 20 "${PUBLISHED_URL%/}/release.json?commit=$EXPECTED_SHA" | jq -r '.commit') || published=""
+            if [ "$published" = "$EXPECTED_SHA" ]; then
+              echo "Verified the live release: $EXPECTED_SHA"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::The live website is not serving the expected release."
+          exit 1

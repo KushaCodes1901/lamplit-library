@@ -88,3 +88,9 @@ Added four integration tests using the actual vendored renderer with simulated d
 All twenty-seven tests, lint, type checking, the production build with /lamplit-library/ asset paths, and diff whitespace checks pass before publication.
 
 Publication commit 4e717d4 passed all checks on GitHub Actions (run 42267433154). The Pages deploy step failed after remaining in deployment_queued; the existing site continued serving the previous release. A new documentation commit retries publication without changing the verified application.
+
+### Live release verification — 6 November 2026
+
+Authenticated Pages inspection confirmed workflow publishing was configured and the attempted deployment had status `deployment_failed`. Reapplying the existing setting and retrying the failed job did not recover publication. Publishing mode was then reset from workflow to branch and immediately back to workflow, retaining the same URL, HTTPS policy and source. A fresh release follows that reset.
+
+The workflow now stamps `release.json` with the built commit and checks that exact value at the public URL after deployment. A successful build alone does not establish a successful live update; this final check fails if Pages still serves an older release. No application behavior changes in this publishing repair.
