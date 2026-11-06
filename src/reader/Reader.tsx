@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { bookWords, type Book, type Word } from "../data/books";
 import type { Progress, Settings } from "../lib/storage";
+import { PaperTurn } from "./PaperTurn";
 import { Modal } from "../components/Modal";
 import { paginate, pageForAnchor, type Page } from "./pagination";
 
@@ -92,6 +93,7 @@ function measureHtml(
 
 export function Reader({
   book,
+  reducedMotion = false,
   progress,
   settings,
   storageOk,
@@ -100,6 +102,7 @@ export function Reader({
   onClose,
 }: {
   book: Book;
+  reducedMotion?: boolean;
   progress?: Progress;
   settings: Settings;
   storageOk: boolean;
@@ -111,6 +114,27 @@ export function Reader({
   const [anchor, setAnchor] = useState(() =>
     Math.min(progress?.anchor ?? 0, words.length - 1),
   );
+  const [flip, setFlip] = useState<{
+    direction: number;
+    front: Page;
+    back?: Page;
+    stationary?: Page;
+    stationaryNumber?: number;
+    underneath?: Page;
+  } | null>(null);
+  const turning = useRef(false);
+  const flipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (flipTimer.current) clearTimeout(flipTimer.current);
+    },
+    [],
+  );
+  function finishTurn() {
+    if (flipTimer.current) clearTimeout(flipTimer.current);
+    turning.current = false;
+    setFlip(null);
+  }
   const [pages, setPages] = useState<Page[]>([]);
   const [spread, setSpread] = useState(false);
   const [controls, setControls] = useState(false);
@@ -159,6 +183,17 @@ export function Reader({
       raf = 0;
     const layout = () => {
       if (disposed) return;
+      const body = area.parentElement!;
+      const paper = body.getBoundingClientRect();
+      const text = area.getBoundingClientRect();
+      const top = Math.max(0, text.top - paper.top - body.clientTop);
+      const side = Math.max(0, text.left - paper.left - body.clientLeft);
+      area.style.setProperty("--paper-top", `${top}px`);
+      area.style.setProperty("--paper-side", `${side}px`);
+      area.style.setProperty(
+        "--paper-bottom",
+        `${Math.max(0, body.clientHeight - top - area.clientHeight)}px`,
+      );
       const wide = area.clientWidth >= 800;
       const gap = wide ? 54 : 0;
       const width = (area.clientWidth - gap) / (wide ? 2 : 1);
@@ -297,7 +332,25 @@ export function Reader({
   }
   function turn(direction: number) {
     const index = leftPage + direction * (spread ? 2 : 1);
-    if (index >= 0 && index < pages.length) go(pages[index].start);
+    if (turning.current || index < 0 || index >= pages.length) return;
+    if (!reducedMotion) {
+      turning.current = true;
+      const front = pages[direction > 0 && spread ? leftPage + 1 : leftPage];
+      const back = pages[direction > 0 ? index : index + (spread ? 1 : 0)];
+      const stationary = spread
+        ? pages[direction > 0 ? leftPage : leftPage + 1]
+        : undefined;
+      setFlip({
+        direction,
+        front,
+        back,
+        stationary,
+        stationaryNumber: leftPage + (direction > 0 ? 1 : 2),
+        underneath: pages[direction > 0 ? index + (spread ? 1 : 0) : index],
+      });
+      flipTimer.current = setTimeout(finishTurn, 1400);
+    }
+    go(pages[index].start);
   }
   function toggleBookmark() {
     const next = bookmarks.includes(anchor)
@@ -320,7 +373,7 @@ export function Reader({
   return (
     <Modal
       title={`Reading ${book.title}`}
-      className={`reader-modal theme-${settings.theme}`}
+      className={`reader-modal book-reader theme-${settings.theme} ${reducedMotion ? "motion-free" : ""}`}
       onClose={onClose}
     >
       <div
@@ -492,16 +545,75 @@ export function Reader({
               className={`page-area ${spread ? "spread" : ""}`}
               ref={pageArea}
             >
-              {shown.map((p, i) => (
-                <article
-                  className="paper-page prose"
-                  key={`${p.start}-${p.end}`}
-                  aria-label={`Page ${leftPage + i + 1}`}
-                >
-                  {chunks(book, words, p.start, p.end, renderWords)}
-                  <span className="page-number">{leftPage + i + 1}</span>
-                </article>
-              ))}
+              {shown.map((target, i) => {
+                const p =
+                  flip?.stationary &&
+                  spread &&
+                  i === (flip.direction > 0 ? 0 : 1)
+                    ? flip.stationary
+                    : target;
+                const number =
+                  p === flip?.stationary
+                    ? flip.stationaryNumber
+                    : leftPage + i + 1;
+                return (
+                  <article
+                    className="paper-page prose"
+                    key={`${p.start}-${p.end}`}
+                    aria-label={`Page ${number}`}
+                  >
+                    {chunks(book, words, p.start, p.end, renderWords)}
+                    <span className="page-number">{number}</span>
+                  </article>
+                );
+              })}
+              {flip && (
+                <PaperTurn
+                  direction={flip.direction}
+                  spread={spread}
+                  onFinish={finishTurn}
+                  before={
+                    flip.stationary
+                      ? chunks(
+                          book,
+                          words,
+                          flip.stationary.start,
+                          flip.stationary.end,
+                          (slice) => slice.map((w) => w.text).join(" "),
+                        )
+                      : null
+                  }
+                  after={
+                    flip.underneath
+                      ? chunks(
+                          book,
+                          words,
+                          flip.underneath.start,
+                          flip.underneath.end,
+                          (slice) => slice.map((w) => w.text).join(" "),
+                        )
+                      : null
+                  }
+                  front={chunks(
+                    book,
+                    words,
+                    flip.front.start,
+                    flip.front.end,
+                    (slice) => slice.map((w) => w.text).join(" "),
+                  )}
+                  back={
+                    flip.back
+                      ? chunks(
+                          book,
+                          words,
+                          flip.back.start,
+                          flip.back.end,
+                          (slice) => slice.map((w) => w.text).join(" "),
+                        )
+                      : null
+                  }
+                />
+              )}
               <div ref={measure} className="prose measure" aria-hidden="true" />
             </div>
           ) : (
@@ -517,7 +629,7 @@ export function Reader({
         <footer className="reader-footer">
           <button
             className="text-button"
-            disabled={settings.mode !== "pages" || leftPage === 0}
+            disabled={!!flip || settings.mode !== "pages" || leftPage === 0}
             aria-label="Previous page"
             onClick={() => turn(-1)}
           >
@@ -554,7 +666,7 @@ export function Reader({
           ) : (
             <button
               className="text-button"
-              disabled={settings.mode !== "pages" || !pages.length}
+              disabled={!!flip || settings.mode !== "pages" || !pages.length}
               aria-label="Next page"
               onClick={() => turn(1)}
             >

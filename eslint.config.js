@@ -3,7 +3,7 @@ import tseslint from "typescript-eslint";
 import globals from "globals";
 import hooks from "eslint-plugin-react-hooks";
 export default tseslint.config(
-  { ignores: ["dist/**", "node_modules/**", "tmp/**"] },
+  { ignores: ["dist/**", "node_modules/**", "tmp/**", "src/vendor/*.js"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

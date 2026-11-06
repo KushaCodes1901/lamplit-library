@@ -11,12 +11,13 @@ export type Progress = {
   bookmarks: number[];
 };
 export type Saved = {
-  version: 1;
+  version: 2;
   settings: Settings;
   progress: Record<string, Progress>;
   lastBook: string | null;
   onboarding: boolean;
 };
+// Keep the original key so existing reading positions migrate in place.
 export const STORAGE_KEY = "lamplit-library:v1";
 export const defaultSettings: Settings = {
   theme: "sepia",
@@ -26,7 +27,7 @@ export const defaultSettings: Settings = {
 };
 export function emptySaved(): Saved {
   return {
-    version: 1,
+    version: 2,
     settings: { ...defaultSettings },
     progress: {},
     lastBook: null,
@@ -45,9 +46,13 @@ export function parseSaved(raw: string | null): Saved {
   if (!raw) return fallback;
   try {
     const data = JSON.parse(raw);
-    if (!data || data.version !== 1) return fallback;
+    if (!data || ![1, 2].includes(data.version)) return fallback;
     const settings = data.settings ?? {};
-    if (["sepia", "light", "dark"].includes(settings.theme))
+    // Adopt the new warm book appearance once; later explicit theme choices persist.
+    if (
+      data.version === 2 &&
+      ["sepia", "light", "dark"].includes(settings.theme)
+    )
       fallback.settings.theme = settings.theme;
     if (
       typeof settings.fontSize === "number" &&

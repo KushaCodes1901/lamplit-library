@@ -27,3 +27,5 @@ Fonts are self-hosted through Fontsource: Cormorant Garamond, DM Sans, and Libre
 **Table:** Isolated transparent walnut reading table with green brass lamps, open books, ink pot, and traditional wooden chairs. Reference camera, perspective and warm illustrated lighting. Entire feet visible. No room, rug or text.
 
 **Covers:** Exact four-column, two-row grid of eight coherent vintage literary illustrations with gold engraving, dark jewel tones, paper grain and generous areas for HTML titles. Subjects in reading order: lamplit rainy window; ferry and orchard; pigeon on municipal chair; fine coat and ribbon; storm lighthouse; night railway parcel; moon-faced pendulum clock; blue envelope, flower and notebook. No titles, letters, publisher marks, or imitation of published editions.
+
+Page-fold rendering uses a local MIT-licensed StPageFlip 2.0.7 distribution. Its license, source and lifecycle changes are documented in `src/vendor/README.md` and `src/vendor/page-flip.LICENSE`.

@@ -197,6 +197,7 @@ export default function App() {
       {panel?.type === "catalog" && (
         <Catalog
           genre={panel.genre}
+          reducedMotion={reducedMotion}
           storageOk={storageOk}
           progress={saved.progress}
           onClose={close}
@@ -207,6 +208,7 @@ export default function App() {
         <Reader
           key={panel.book.id}
           book={panel.book}
+          reducedMotion={reducedMotion}
           storageOk={storageOk}
           settings={saved.settings}
           progress={saved.progress[panel.book.id]}

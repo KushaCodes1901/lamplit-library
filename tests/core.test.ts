@@ -63,6 +63,30 @@ describe("device persistence", () => {
     expect(s.progress.a).toBeUndefined();
     expect(s.progress.b.bookmarks).toEqual([1, 15]);
   });
+  it("keeps legacy reading places while introducing warm book paper", () => {
+    const saved = parseSaved(
+      JSON.stringify({
+        version: 1,
+        settings: { theme: "dark", fontSize: 21, mode: "pages" },
+        lastBook: "last-light",
+        onboarding: true,
+        progress: {
+          "last-light": { anchor: 216, bookmarks: [19, 216], completed: false },
+        },
+      }),
+    );
+    expect(saved.version).toBe(2);
+    expect(saved.settings.theme).toBe("sepia");
+    expect(saved.settings.fontSize).toBe(21);
+    expect(saved.lastBook).toBe("last-light");
+    expect(saved.progress["last-light"]).toEqual({
+      anchor: 216,
+      bookmarks: [19, 216],
+      completed: false,
+    });
+    saved.settings.theme = "dark";
+    expect(parseSaved(JSON.stringify(saved)).settings.theme).toBe("dark");
+  });
   it("supports browsers with blocked reads or exhausted storage", () => {
     expect(
       readSaved({
