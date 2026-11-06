@@ -86,3 +86,5 @@ The engine's `disableFlipByClick` corner guard also rejected programmatic portra
 Added four integration tests using the actual vendored renderer with simulated desktop/mobile dimensions. They require a moving clipped sheet during the turn and completion through the engine, before the reader fallback. Reinstating the original guard reproduced exactly one failure: mobile Previous. With the fix, both directions in both layouts pass. These geometry checks do not claim physical-device testing.
 
 All twenty-seven tests, lint, type checking, the production build with /lamplit-library/ asset paths, and diff whitespace checks pass before publication.
+
+Publication commit 4e717d4 passed all checks on GitHub Actions (run 42267433154). The Pages deploy step failed after remaining in deployment_queued; the existing site continued serving the previous release. A new documentation commit retries publication without changing the verified application.
